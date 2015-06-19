@@ -1,8 +1,26 @@
 {% extends "fileupload/base.html" %}
+{% blcok sccript %}
+<script type="text/javascript">
+    $(function () {
+        dialog = $(".popup_window").dialog({
+            autoOpen: false,
+            modal: true,
+            height: 500,
+            width: 300
+        });
 
+        $(".popup").click(fucntion (){
+            dialog.dialog("open");
+        });
+    })
+</script>
+{% endblock %}
 {% block content %}
 Index
 
+<a class="btn btn-primary popup">Upload File</a>
+
+<div class="popup_window">
 <form id="fileupload" action="//jquery-file-upload.appspot.com/" method="POST" enctype="multipart/form-data">
         <!-- Redirect browsers with JavaScript disabled to the origin page -->
         <noscript><input type="hidden" name="redirect" value="https://blueimp.github.io/jQuery-File-Upload/"></noscript>
@@ -43,5 +61,8 @@ Index
         </div>
         <!-- The table listing the files available for upload/download -->
         <table role="presentation" class="table table-striped"><tbody class="files"></tbody></table>
-    </form>
+    </form>    
+</div>
+
+
 {% endblock %}
