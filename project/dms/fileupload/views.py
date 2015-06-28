@@ -1,5 +1,8 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework import generics
+from .models import File, Folder
+from .serializers import FileSerializer, FolderSerializer
 
 
 # remember to fix this later
@@ -12,3 +15,23 @@ def index(request):
 @csrf_exempt
 def browser(request):
     return render(request, 'fileupload/browser.html')
+
+
+class FileList(generics.ListCreateAPIView):
+    queryset = File.objects.all()
+    serializer_class = FileSerializer
+
+
+class FileDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = File.objects.all()
+    serializer_class = FileSerializer
+
+
+class FolderList(generics.ListCreateAPIView):
+    queryset = Folder.objects.all()
+    serializer_class = FolderSerializer
+
+
+class FolderDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Folder.objects.all()
+    serializer_class = FolderSerializer

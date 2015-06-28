@@ -43,6 +43,7 @@ VENDOR_APPS = (
     'mptt',
     'filer',
     'easy_thumbnails',
+    'rest_framework',
 )
 
 CUSTOM_APPS = (
@@ -114,3 +115,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 THUMBNAIL_HIGH_RESOLUTION = True
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',
+    )
+}
