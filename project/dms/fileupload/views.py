@@ -8,6 +8,7 @@ def index(request):
     return render(request, "fileupload/index.html")
 
 
+# remember to fix this later
 @csrf_exempt
 def browser(request):
     return render(request, 'fileupload/browser.html')
