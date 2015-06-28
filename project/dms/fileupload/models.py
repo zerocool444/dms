@@ -15,9 +15,12 @@ class Folder(MPTTModel):
     name = models.CharField(max_length=255)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    pid = models.UUIDField()
+    pid = models.UUIDField(null=True, blank=True)
     parent = TreeForeignKey('self', null=True, blank=True,
                             related_name='children', db_index=True)
+
+    def __str__(self):
+        return self.name
 
 
 class File(MPTTModel):
@@ -28,3 +31,6 @@ class File(MPTTModel):
     pid = models.UUIDField(null=True, blank=True)
     parent = TreeForeignKey(Folder, null=True, blank=True,
                             related_name='file_parent', db_index=True)
+
+    def __str__(self):
+        return self.name

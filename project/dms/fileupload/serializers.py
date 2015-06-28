@@ -14,3 +14,14 @@ class FolderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Folder
         fields = ('name', 'created', 'modified', 'pid', 'parent',)
+
+'''
+Not sure if this is needed. Saw the idea... somewhere.
+'''
+class SubfolderSerializer(serializers.ModelSerializer):
+    pid = serializers.CharField(max_length=255, read_only=True)
+    parent = FolderSerializer()
+
+    class Meta:
+        model = Folder
+        fields = ('name', 'created', 'modified', 'pid', 'parent',)
