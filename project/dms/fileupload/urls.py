@@ -16,6 +16,8 @@ folder = [
 filesystem = [
     url(r'^file/', include(file, namespace='file')),
     url(r'^folder/', include(folder, namespace='folder')),
+    url(r'^$', views.FilesystemEntryList.as_view(), name='list_create'),
+    url(r'^(?P<pk>[0-9]+)/$', views.FilesystemEntryDetail.as_view(), name='detail'),
 
 ]
 

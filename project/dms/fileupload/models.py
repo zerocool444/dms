@@ -1,36 +1,30 @@
 from django.db import models
-from filer.fields.file import FilerFileField
 from mptt.models import MPTTModel, TreeForeignKey
-
-'''
-class File(models.Model):
-    name = models.CharField(max_length=255)
-    file = FilerFileField(related_name='filer_file')
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-'''
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 
-class Folder(MPTTModel):
-    name = models.CharField(max_length=255)
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-    pid = models.UUIDField(null=True, blank=True)
+class FilesystemEntry(MPTTModel):
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
     parent = TreeForeignKey('self', null=True, blank=True,
-                            related_name='children', db_index=True)
-
-    def __str__(self):
-        return self.name
+        related_name='children')
 
 
-class File(MPTTModel):
-    name = models.CharField(max_length=255)
-    file = models.FileField()
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
+class Folder(models.Model):
     pid = models.UUIDField(null=True, blank=True)
-    parent = TreeForeignKey(Folder, null=True, blank=True,
-                            related_name='file_parent', db_index=True)
+    name = models.CharField(max_length=255)
+    type = models.CharField(max_length=50)
 
     def __str__(self):
         return self.name
+
+class File(models.Model):
+    pid = models.UUIDField(null=True, blank=True)
+    file = models.FileField()
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.file.name

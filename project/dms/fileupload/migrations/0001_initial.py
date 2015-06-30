@@ -8,6 +8,7 @@ import mptt.fields
 class Migration(migrations.Migration):
 
     dependencies = [
+        ('contenttypes', '0002_remove_content_type_name'),
     ]
 
     operations = [
@@ -15,15 +16,23 @@ class Migration(migrations.Migration):
             name='File',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('name', models.CharField(max_length=255)),
-                ('file', models.FileField(upload_to=b'')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('modified', models.DateTimeField(auto_now=True)),
-                ('pid', models.UUIDField()),
+                ('filename', models.CharField(max_length=255)),
+                ('encoding', models.CharField(max_length=20)),
+                ('date_created', models.DateTimeField(auto_now_add=True)),
+                ('date_updated', models.DateTimeField(auto_now=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='FilesystemEntry',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('object_id', models.PositiveIntegerField()),
                 ('lft', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('rght', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('tree_id', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('level', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('content_type', models.ForeignKey(to='contenttypes.ContentType')),
+                ('parent', mptt.fields.TreeForeignKey(related_name='children', blank=True, to='fileupload.FilesystemEntry', null=True)),
             ],
             options={
                 'abstract': False,
@@ -34,22 +43,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=255)),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('modified', models.DateTimeField(auto_now=True)),
-                ('pid', models.UUIDField()),
-                ('lft', models.PositiveIntegerField(editable=False, db_index=True)),
-                ('rght', models.PositiveIntegerField(editable=False, db_index=True)),
-                ('tree_id', models.PositiveIntegerField(editable=False, db_index=True)),
-                ('level', models.PositiveIntegerField(editable=False, db_index=True)),
-                ('parent', mptt.fields.TreeForeignKey(related_name='children', blank=True, to='fileupload.Folder', null=True)),
+                ('type', models.CharField(max_length=50)),
             ],
-            options={
-                'abstract': False,
-            },
-        ),
-        migrations.AddField(
-            model_name='file',
-            name='parent',
-            field=mptt.fields.TreeForeignKey(related_name='file_parent', blank=True, to='fileupload.Folder', null=True),
         ),
     ]

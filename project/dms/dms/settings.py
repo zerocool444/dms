@@ -41,7 +41,7 @@ DJANGO_APPS = (
 
 VENDOR_APPS = (
     'mptt',
-    'filer',
+    #'filer',
     'easy_thumbnails',
     'rest_framework',
 )

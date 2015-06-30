@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics
-from .models import File, Folder
-from .serializers import FileSerializer, FolderSerializer
+from .models import File, Folder, FilesystemEntry
+from .serializers import FilesystemEntrySerializer, FileSerializer, FolderSerializer
 
 
 # remember to fix this later
@@ -35,3 +35,13 @@ class FolderList(generics.ListCreateAPIView):
 class FolderDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Folder.objects.all()
     serializer_class = FolderSerializer
+
+
+class FilesystemEntryList(generics.ListCreateAPIView):
+    queryset = FilesystemEntry.objects.all()
+    serializer_class = FilesystemEntrySerializer
+
+
+class FilesystemEntryDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = FilesystemEntry.objects.all()
+    serializer_class = FilesystemEntrySerializer

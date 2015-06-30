@@ -1,4 +1,4 @@
-from .models import File, Folder
+from .models import FilesystemEntry, File, Folder
 from rest_framework import serializers
 
 
@@ -15,13 +15,10 @@ class FolderSerializer(serializers.ModelSerializer):
         model = Folder
         fields = ('name', 'created', 'modified', 'pid', 'parent',)
 
-'''
-Not sure if this is needed. Saw the idea... somewhere.
-'''
-class SubfolderSerializer(serializers.ModelSerializer):
-    pid = serializers.CharField(max_length=255, read_only=True)
-    parent = FolderSerializer()
+
+class FilesystemEntrySerializer(serializers.ModelSerializer):
+    #pid = serializers.CharField(max_length=255, read_only=True)
 
     class Meta:
-        model = Folder
-        fields = ('name', 'created', 'modified', 'pid', 'parent',)
+        model = FilesystemEntry
+        fields = ('content_type', 'object_id', 'content_object', 'parent',)
