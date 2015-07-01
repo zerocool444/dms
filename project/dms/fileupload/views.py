@@ -2,7 +2,8 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics
 from .models import File, Folder, FilesystemEntry
-from .serializers import FilesystemEntrySerializer, FileSerializer, FolderSerializer
+from .serializers import (FilesystemEntrySerializer, FileSerializer,
+                     FolderSerializer)
 
 
 # remember to fix this later

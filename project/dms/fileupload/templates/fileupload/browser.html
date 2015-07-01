@@ -22,23 +22,27 @@
       }
   ]
 }); */
-    webix.ui({
-    view: 'treetable',
-    columns: [
-        { id: 'name', header: 'Name'},
-        { id: 'size', header: 'Size'},
-        { id: 'type', header: 'Type'},
-        { id: 'items', header: 'Items'},
-        { id: 'modified', header: 'Modified'},
-        { id: 'modified_by', header: 'Modified By'},
-        { id: 'metadata', header: 'Metadata'}
+    var documentItems;
+    $(document).ready(function() {
+        documentItems = $.getJSON("http://localhost:8000/api/filesystem/", function(data) {
+        });
+        webix.ui({
+        view: 'treetable',
+        columns: [
+            { id: 'name', header: 'Name'},
+            { id: 'size', header: 'Size'},
+            { id: 'type', header: 'Type'},
+            { id: 'items', header: 'Items'},
+            { id: 'modified', header: 'Modified'},
+            { id: 'modified_by', header: 'Modified By'},
+            { id: 'metadata', header: 'Metadata'}
+            ],
+        data: [{
+            'name': '1', 'size': '1kb', 'type': 'txt', 'items': '', 'modified': 'lol',
+                'modified_by': 'yo momma', 'metadata': 'Yes please'},
         ],
-    data: [{
-        'name': '1', 'size': '1kb', 'type': 'txt', 'items': '', 'modified': 'lol',
-            'modified_by': 'yo momma', 'metadata': 'Yes please'},
-    ],
-    resizeColumn: true,
-
+        resizeColumn: true,
+        });
     });
 </script>
 {% endblock %}
