@@ -8,7 +8,7 @@ class FileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = File
-        fields = ('name', 'file', 'created', 'modified', 'pid',)
+        fields = ('name', 'file', 'created', 'modified', 'pid', 'size', 'type',)
 
 
 class FolderSerializer(serializers.ModelSerializer):
@@ -36,7 +36,8 @@ class RelatedFilesystemField(serializers.RelatedField):
 
         @author Kevin Porter
         '''
-        value.pid
+
+        value.pid # don't remove this. FML.
         if isinstance(value, File):
             serializer = FileSerializer(value)
         elif isinstance(value, Folder):

@@ -22,9 +22,27 @@
       }
   ]
 }); */
-    var documentItems;
+    var files = {};
     $(document).ready(function() {
-        documentItems = $.getJSON("http://localhost:8000/api/filesystem/", function(data) {
+        $.getJSON('http://localhost:8000/api/filesystem/')
+        .done(function(data) {
+            $.each(data, function(i, item) {
+                $.each(this, function(k, v) {
+                    if (k == 'content_object') {
+                        //files = jQuery.extend(true, {}, v);
+                        $.each(v, function(k, v) {
+                            console.log(k + ': ' + v);
+                            files[k] = v;
+                        });
+                    } else {
+                        console.log(k + ': ' + v);
+                    }
+
+                })
+            });
+        });
+        $.each(files, function(k, v) {
+            console.log(k + ': ' + v);
         });
         webix.ui({
         view: 'treetable',
@@ -38,7 +56,7 @@
             { id: 'metadata', header: 'Metadata'}
             ],
         data: [{
-            'name': '1', 'size': '1kb', 'type': 'txt', 'items': '', 'modified': 'lol',
+            'name': files['name'], 'size': files['size'], 'type': files['type'], 'items': '', 'modified': files['modified'],
                 'modified_by': 'yo momma', 'metadata': 'Yes please'},
         ],
         resizeColumn: true,

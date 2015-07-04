@@ -22,6 +22,14 @@ class File(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
+    def type(self):
+        name = self.file.name
+        extension = name.split('.')[-1]
+        return extension
+
+    def size(self):
+        return self.file.size
+
     def __str__(self):
         return self.name
 
