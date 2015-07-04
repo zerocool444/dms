@@ -10,24 +10,30 @@ class Folder(models.Model):
     A folder in the filesystem.
     @author Kevin Porter
     """
-    owner = models.ManyToManyField(User)
+    owners = models.ManyToManyField(User)
     pid = models.UUIDField(null=True, blank=True)
     name = models.CharField(max_length=255)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
     def modified_by(self):
-        return self.owner.user.username
+        owners = self.owners.all()
+        owners_list = ""
+
+        for owner in owners:
+            owners_list += (owner.username + ",")
+
+        return owners_list
 
     def type(self):
-        return 'Folder'  # always a folder
+        return 'Folder'  # always a folder, right?
 
     def size(self):
         """
         Returns the size of the folder (i.e., its contents)
         @author Kevin Porter
         """
-        children = get_children()
+        children = self.get_children()
         size = 0
 
         for child in children:
@@ -41,18 +47,23 @@ class Folder(models.Model):
         return tree_ptr
 
     def get_children(self):
-        tree_ptr = get_ptr()
+        tree_ptr = self.get_ptr()
         children = tree_ptr.get_children()
         return children
 
     def items(self):
-        children = get_children()
+        children = self.get_children()
         items = children.count()
 
         for child in children:
-            child_items = child.items()
-            items += child_items
-
+            if isinstance(child, File):
+                items += 1
+                print items
+            elif isinstance(child, Folder):
+                child_items = child.items()
+                items += child_items
+                print items
+        print items
         return items
 
     def __str__(self):
@@ -65,7 +76,7 @@ class File(models.Model):
     @author Kevin Porter
     """
 
-    owner = models.ManyToManyField(User)
+    owners = models.ManyToManyField(User)
     pid = models.UUIDField(null=True, blank=True)
     name = models.CharField(max_length=255)
     file = models.FileField()
@@ -90,9 +101,13 @@ class File(models.Model):
         return tree_ptr
 
     def modified_by(self):
-        user = self.owner.get(pk=self.id)
-        username = user.username
-        return username
+        owners = self.owners.all()
+        owners_list = ""
+
+        for owner in owners:
+            owners_list += (owner.username + ",")
+
+        return owners_list
 
     def __str__(self):
         return self.name

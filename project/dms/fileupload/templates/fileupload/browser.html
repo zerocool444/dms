@@ -24,6 +24,11 @@
 }); */
     $(document).ready(function() {
         var entries = [];
+        var files = {};
+        var fakeData = [
+        {
+            'name': files['name'], 'size': files['size'], 'type': files['type'], 'items': '', 'modified': files['modified'],
+                'modified_by': 'yo momma', 'metadata': 'Yes please'},];
         $.getJSON('http://localhost:8000/api/filesystem/')
         .done(function(data) {
             $.each(data, function(i, item) {
@@ -32,14 +37,17 @@
                     if (k == 'content_object') {
                         $.each(v, function(k, v) {
                             entry[k] = v;
-                            console.log(entry[k]);
+                            files[k] = v;
+                            //console.log(entry[k]);
                         });
                     }
-                    entries[v] = entry;
+                    if (entry['size']) {
+                        entries.push(entry);
+                    }
                     //console.log(entry);
                 });
             });
-            console.log(entries);
+            console.log(fakeData);
             webix.ui({
             view: 'treetable',
             columns: [
