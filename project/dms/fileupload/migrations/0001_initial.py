@@ -16,10 +16,11 @@ class Migration(migrations.Migration):
             name='File',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('filename', models.CharField(max_length=255)),
-                ('encoding', models.CharField(max_length=20)),
-                ('date_created', models.DateTimeField(auto_now_add=True)),
-                ('date_updated', models.DateTimeField(auto_now=True)),
+                ('pid', models.UUIDField(null=True, blank=True)),
+                ('name', models.CharField(max_length=255)),
+                ('file', models.FileField(upload_to=b'')),
+                ('created', models.DateTimeField(auto_now_add=True)),
+                ('modified', models.DateTimeField(auto_now=True)),
             ],
         ),
         migrations.CreateModel(
@@ -42,8 +43,10 @@ class Migration(migrations.Migration):
             name='Folder',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('pid', models.UUIDField(null=True, blank=True)),
                 ('name', models.CharField(max_length=255)),
-                ('type', models.CharField(max_length=50)),
+                ('created', models.DateTimeField(auto_now_add=True)),
+                ('modified', models.DateTimeField(auto_now=True)),
             ],
         ),
     ]

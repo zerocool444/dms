@@ -8,7 +8,8 @@ class FileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = File
-        fields = ('name', 'file', 'created', 'modified', 'pid', 'size', 'type',)
+        fields = ('name', 'file', 'created', 'modified', 'pid', 'size', 'type',
+                  'modified_by', 'items',)
 
 
 class FolderSerializer(serializers.ModelSerializer):
@@ -16,7 +17,8 @@ class FolderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Folder
-        fields = ('name', 'created', 'modified', 'pid',)
+        fields = ('name', 'created', 'modified', 'pid', 'modified_by',
+                  'items',)
 
 
 class RelatedFilesystemField(serializers.RelatedField):
@@ -33,11 +35,10 @@ class RelatedFilesystemField(serializers.RelatedField):
         model properties, the whole serializer shits itself.
 
         Like. WTF.
-
         @author Kevin Porter
         '''
 
-        value.pid # don't remove this. FML.
+        value.pid  # don't remove this. FML.
         if isinstance(value, File):
             serializer = FileSerializer(value)
         elif isinstance(value, Folder):

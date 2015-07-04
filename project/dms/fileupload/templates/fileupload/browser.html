@@ -22,45 +22,42 @@
       }
   ]
 }); */
-    var files = {};
     $(document).ready(function() {
+        var entries = [];
         $.getJSON('http://localhost:8000/api/filesystem/')
         .done(function(data) {
             $.each(data, function(i, item) {
                 $.each(this, function(k, v) {
+                    var entry = {};
                     if (k == 'content_object') {
-                        //files = jQuery.extend(true, {}, v);
                         $.each(v, function(k, v) {
-                            console.log(k + ': ' + v);
-                            files[k] = v;
+                            entry[k] = v;
+                            console.log(entry[k]);
                         });
-                    } else {
-                        console.log(k + ': ' + v);
                     }
-
-                })
+                    entries[v] = entry;
+                    //console.log(entry);
+                });
+            });
+            console.log(entries);
+            webix.ui({
+            view: 'treetable',
+            columns: [
+                { id: 'name', header: 'Name'},
+                { id: 'size', header: 'Size'},
+                { id: 'type', header: 'Type'},
+                { id: 'items', header: 'Items'},
+                { id: 'modified', header: 'Modified'},
+                { id: 'modified_by', header: 'Modified By'}, // Django user
+                // Not actually sure what this one is supposed to be.
+                // { id: 'metadata', header: 'Metadata'}
+                ],
+            data: entries,
+            resizeColumn: true,
             });
         });
-        $.each(files, function(k, v) {
-            console.log(k + ': ' + v);
-        });
-        webix.ui({
-        view: 'treetable',
-        columns: [
-            { id: 'name', header: 'Name'},
-            { id: 'size', header: 'Size'},
-            { id: 'type', header: 'Type'},
-            { id: 'items', header: 'Items'},
-            { id: 'modified', header: 'Modified'},
-            { id: 'modified_by', header: 'Modified By'},
-            { id: 'metadata', header: 'Metadata'}
-            ],
-        data: [{
-            'name': files['name'], 'size': files['size'], 'type': files['type'], 'items': '', 'modified': files['modified'],
-                'modified_by': 'yo momma', 'metadata': 'Yes please'},
-        ],
-        resizeColumn: true,
-        });
+                    console.log('test');
+
     });
 </script>
 {% endblock %}
