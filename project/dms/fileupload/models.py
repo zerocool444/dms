@@ -33,17 +33,20 @@ class Folder(models.Model):
         Returns the size of the folder (i.e., its contents)
         @author Kevin Porter
         """
-        children = self.get_children()
+        descendants = self.get_descendants()
         size = 0
 
-        for child in children:
-            entry = child.content_object
+        for descendant in descendants:
+            entry = descendant.content_object
             size += entry.size()
 
         return size
 
     def get_ptr(self):
-        tree_ptr = FilesystemEntry.objects.get(pk=self.id)
+        content_type = ContentType.objects.get(app_label='fileupload',
+                                               model='folder')
+        tree_ptr = FilesystemEntry.objects.get(object_id=self.id,
+                                               content_type=content_type)
         return tree_ptr
 
     def get_children(self):
@@ -51,19 +54,14 @@ class Folder(models.Model):
         children = tree_ptr.get_children()
         return children
 
-    def items(self):
-        children = self.get_children()
-        items = children.count()
+    def get_descendants(self):
+        tree_ptr = self.get_ptr()
+        descendants = tree_ptr.get_descendants()
+        return descendants
 
-        for child in children:
-            if isinstance(child, File):
-                items += 1
-                print items
-            elif isinstance(child, Folder):
-                child_items = child.items()
-                items += child_items
-                print items
-        print items
+    def items(self):
+        tree_ptr = self.get_ptr()
+        items = tree_ptr.get_descendant_count()
         return items
 
     def __str__(self):
@@ -97,8 +95,16 @@ class File(models.Model):
         pass
 
     def get_ptr(self):
-        tree_ptr = FilesystemEntry.objects.get(pk=self.id)
+        content_type = ContentType.objects.get(app_label='fileupload',
+                                               model='file')
+        tree_ptr = FilesystemEntry.objects.get(object_id=self.id,
+                                               content_type=content_type)
         return tree_ptr
+
+    def get_descendants(self):
+        tree_ptr = self.get_ptr()
+        descendants = tree_ptr.get_descendants()
+        return descendants
 
     def modified_by(self):
         owners = self.owners.all()
