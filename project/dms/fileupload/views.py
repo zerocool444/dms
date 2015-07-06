@@ -39,10 +39,25 @@ class FolderDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class FilesystemEntryList(generics.ListCreateAPIView):
-    queryset = FilesystemEntry.objects.all()
     filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('parent',)
     serializer_class = FilesystemEntrySerializer
+
+    def get_queryset(self):
+        """
+        Intercepts the querystring so that checking for no parent actually
+        works.
+        @author Kevin Porter
+        """
+        queryset = FilesystemEntry.objects.all()
+        parent = self.request.query_params.get('parent', None)
+
+        if parent is not None:
+            if parent == '':
+                parent = None
+            queryset = queryset.filter(parent=parent)
+
+        return queryset
 
 
 class FilesystemEntryDetail(generics.RetrieveUpdateDestroyAPIView):

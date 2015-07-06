@@ -127,7 +127,8 @@ class FilesystemEntry(MPTTModel):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
-    parent = TreeForeignKey('self', related_name='children', default=0)
+    parent = TreeForeignKey('self', related_name='children', blank=True,
+                            null=True)
 
     def __str__(self):
         entry_type = ContentType.objects.get(app_label='fileupload',

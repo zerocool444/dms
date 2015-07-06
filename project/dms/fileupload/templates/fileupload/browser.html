@@ -23,57 +23,69 @@
   ]
 }); */
     $(document).ready(function() {
-        var entries = loadDataAt(3);
-        console.log(entries);
-        var browser = webix.ui({
-            view: 'treetable',
-            columns: [
-                { id: 'name', header: 'Name'},
-                { id: 'size', header: 'Size'},
-                { id: 'type', header: 'Type'},
-                { id: 'items', header: 'Items'},
-                { id: 'modified', header: 'Modified'},
-                { id: 'modified_by', header: 'Modified By'}, // Django user
-                // Not actually sure what this one is supposed to be.
-                // { id: 'metadata', header: 'Metadata'}
-            ],
-            data: entries,
-            resizeColumn: true,
-            showOverlay: "Loading",
-            select: "row",
-            multiselect: true,
-        });
-        browser.attachEvent('onItemDblClick', function(id, e, node) {
-            e.preventDefault();
-            item = browser.getItem(id);
-            browser.loadData(loadDataAt(item['tree_id']));
-        });
-    });
 
-    function loadDataAt(parent_id) {
-        var entries = [];
-        $.getJSON('http://localhost:8000/api/filesystem/?parent=' + parent_id)
+        $.getJSON('http://localhost:8000/api/filesystem/?parent=' + '')
         .done(function(data) {
+            var entries = [];
             $.each(data, function(i, item) {
                 $.each(this, function(k, v) {
-                    if (parent == item['parent']) {
-                        var entry = {};
-                        entry['tree_id'] = item['id'];
-                        if (k == 'content_object') {
-                            $.each(v, function(k, v) {
-                                entry[k] = v;
-                            });
-                        }
-                        if (entry['size']) {
-                            // just to guarantee we're getting real objects
-                            entries.push(entry);
-                        }
+                    var entry = {};
+                    entry['tree_id'] = item['id'];
+                    if (k == 'content_object') {
+                        $.each(v, function(k, v) {
+                            entry[k] = v;
+                        });
+                    }
+                    if (entry['size']) {
+                        // just to guarantee we're getting real objects
+                        entries.push(entry);
                     }
                 });
             });
+            var browser = webix.ui({
+                view: 'treetable',
+                columns: [
+                    { id: 'name', header: 'Name'},
+                    { id: 'size', header: 'Size'},
+                    { id: 'type', header: 'Type'},
+                    { id: 'items', header: 'Items'},
+                    { id: 'modified', header: 'Modified'},
+                    { id: 'modified_by', header: 'Modified By'}, // Django user
+                    // Not actually sure what this one is supposed to be.
+                    // { id: 'metadata', header: 'Metadata'}
+                ],
+                data: entries,
+                resizeColumn: true,
+                showOverlay: "Loading",
+                select: "row",
+                multiselect: true,
+            });
+            browser.attachEvent('onItemDblClick', function(id, e, node) {
+                e.preventDefault();
+                item = browser.getItem(id);
+                $.getJSON('http://localhost:8000/api/filesystem/?parent=' + item['tree_id'])
+                .done(function(data) {
+                    var entries = [];
+                    $.each(data, function(i, item) {
+                        $.each(this, function(k, v) {
+                                var entry = {};
+                                entry['tree_id'] = item['id'];
+                                if (k == 'content_object') {
+                                    $.each(v, function(k, v) {
+                                        entry[k] = v;
+                                    });
+                                }
+                                if (entry['size']) {
+                                    // just to guarantee we're getting real objects
+                                    entries.push(entry);
+                                }
+                        });
+                    });
+                    browser.data = entries;
+                });
+            });
         });
-        console.log(entries);
-    return entries;
-    }
+        //console.log(entries);
+    });
 </script>
 {% endblock %}
