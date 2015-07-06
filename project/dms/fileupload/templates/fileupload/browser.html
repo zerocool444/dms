@@ -23,32 +23,9 @@
   ]
 }); */
     $(document).ready(function() {
-        var entries = [];
-        var files = {};
-        var fakeData = [
-        {
-            'name': files['name'], 'size': files['size'], 'type': files['type'], 'items': '', 'modified': files['modified'],
-                'modified_by': 'yo momma', 'metadata': 'Yes please'},];
-        $.getJSON('http://localhost:8000/api/filesystem/')
-        .done(function(data) {
-            $.each(data, function(i, item) {
-                $.each(this, function(k, v) {
-                    var entry = {};
-                    if (k == 'content_object') {
-                        $.each(v, function(k, v) {
-                            entry[k] = v;
-                            files[k] = v;
-                            //console.log(entry[k]);
-                        });
-                    }
-                    if (entry['size']) {
-                        entries.push(entry);
-                    }
-                    //console.log(entry);
-                });
-            });
-            console.log(fakeData);
-            webix.ui({
+        var entries = loadDataAt(3);
+        console.log(entries);
+        var browser = webix.ui({
             view: 'treetable',
             columns: [
                 { id: 'name', header: 'Name'},
@@ -59,13 +36,44 @@
                 { id: 'modified_by', header: 'Modified By'}, // Django user
                 // Not actually sure what this one is supposed to be.
                 // { id: 'metadata', header: 'Metadata'}
-                ],
+            ],
             data: entries,
             resizeColumn: true,
+            showOverlay: "Loading",
+            select: "row",
+            multiselect: true,
+        });
+        browser.attachEvent('onItemDblClick', function(id, e, node) {
+            e.preventDefault();
+            item = browser.getItem(id);
+            browser.loadData(loadDataAt(item['tree_id']));
+        });
+    });
+
+    function loadDataAt(parent_id) {
+        var entries = [];
+        $.getJSON('http://localhost:8000/api/filesystem/?parent=' + parent_id)
+        .done(function(data) {
+            $.each(data, function(i, item) {
+                $.each(this, function(k, v) {
+                    if (parent == item['parent']) {
+                        var entry = {};
+                        entry['tree_id'] = item['id'];
+                        if (k == 'content_object') {
+                            $.each(v, function(k, v) {
+                                entry[k] = v;
+                            });
+                        }
+                        if (entry['size']) {
+                            // just to guarantee we're getting real objects
+                            entries.push(entry);
+                        }
+                    }
+                });
             });
         });
-                    console.log('test');
-
-    });
+        console.log(entries);
+    return entries;
+    }
 </script>
 {% endblock %}

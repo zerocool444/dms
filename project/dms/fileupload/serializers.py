@@ -56,4 +56,4 @@ class FilesystemEntrySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FilesystemEntry
-        fields = ('content_type', 'content_object', 'object_id', 'parent',)
+        fields = ('id', 'content_type', 'content_object', 'object_id', 'parent',)

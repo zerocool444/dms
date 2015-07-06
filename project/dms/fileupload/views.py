@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework import generics
+from rest_framework import generics, filters
 from .models import File, Folder, FilesystemEntry
 from .serializers import (FilesystemEntrySerializer, FileSerializer,
                      FolderSerializer)
@@ -40,6 +40,8 @@ class FolderDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class FilesystemEntryList(generics.ListCreateAPIView):
     queryset = FilesystemEntry.objects.all()
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_fields = ('parent',)
     serializer_class = FilesystemEntrySerializer
 
 
