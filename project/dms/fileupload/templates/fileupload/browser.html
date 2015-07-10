@@ -9,19 +9,6 @@
 {% endblock %}
 {% block content %}
 <script type="text/javascript">
-/*  webix.ui({
-  rows:[
-      { view:"template",
-        type:"header", template:"My App!" },
-      { view:"datatable",
-        autoConfig:true,
-        editable:true,
-        data:{
-          title:"My Fair Lady", year:1964, votes:533848, rating:8.9, rank:5
-        }
-      }
-  ]
-}); */
     $(document).ready(function() {
 
         $.getJSON('http://localhost:8000/api/filesystem/?parent=' + '')
@@ -63,26 +50,31 @@
             browser.attachEvent('onItemDblClick', function(id, e, node) {
                 e.preventDefault();
                 item = browser.getItem(id);
-                $.getJSON('http://localhost:8000/api/filesystem/?parent=' + item['tree_id'])
-                .done(function(data) {
-                    var entries = [];
-                    $.each(data, function(i, item) {
-                        $.each(this, function(k, v) {
-                                var entry = {};
-                                entry['tree_id'] = item['id'];
-                                if (k == 'content_object') {
-                                    $.each(v, function(k, v) {
-                                        entry[k] = v;
-                                    });
-                                }
-                                if (entry['size']) {
-                                    // just to guarantee we're getting real objects
-                                    entries.push(entry);
-                                }
+                if (item['type'] == 'Folder') {
+                    $.getJSON('http://localhost:8000/api/filesystem/?parent=' + item['tree_id'])
+                    .done(function(data) {
+                        var entries = [];
+                        $.each(data, function(i, item) {
+                            $.each(this, function(k, v) {
+                                    var entry = {};
+                                    entry['tree_id'] = item['id'];
+                                    if (k == 'content_object') {
+                                        $.each(v, function(k, v) {
+                                            entry[k] = v;
+                                        });
+                                    }
+                                    if (entry['size']) {
+                                        // just to guarantee we're getting real objects
+                                        entries.push(entry);
+                                    }
+                            });
                         });
+                        browser.clearAll();
+                        browser.parse(entries, 'json');
                     });
-                    browser.data = entries;
-                });
+                } else {
+
+                }
             });
         });
         //console.log(entries);
