@@ -8,7 +8,7 @@ class FileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = File
-        fields = ('name', 'file', 'created', 'modified', 'pid', 'size', 'type',
+        fields = ('id', 'name', 'file', 'created', 'modified', 'pid', 'size', 'type',
                   'modified_by', 'items',)
 
 
@@ -23,7 +23,6 @@ class FolderSerializer(serializers.ModelSerializer):
 
 class RelatedFilesystemField(serializers.RelatedField):
     '''
-    Jesus fucking Christ.
     @author Kevin Porter
     '''
     def to_internal_value(self, data):
@@ -31,18 +30,15 @@ class RelatedFilesystemField(serializers.RelatedField):
 
     def to_representation(self, value):
         '''
-        For some completely fucknut reason, if I don't try to access one of the
-        model properties, the whole serializer shits itself.
-
-        Like. WTF.
         @author Kevin Porter
         '''
 
-        value.pid  # don't remove this. FML.
         if isinstance(value, File):
             serializer = FileSerializer(value)
         elif isinstance(value, Folder):
             serializer = FolderSerializer(value)
+        elif isinstance(value, FilesystemEntry):
+            return None
         else:
             raise Exception('Not a valid filesystem object.')
 

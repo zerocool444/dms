@@ -6,78 +6,152 @@
 {% endblock %}
 {% block script %}
 <script src="{% static 'fileupload/js/webix.js' %}" type="text/javascript"></script>
-{% endblock %}
-{% block content %}
 <script type="text/javascript">
     $(document).ready(function() {
+        var uploadWindow = webix.ui({
+            view:'window',
+            modal: true,
+            position:'center',
+            id:'upload_window',
+            head: {view:'toolbar', cols: [
+                {view:'label', label:'Upload',},
+                {view:"button", label:"Close", width:70,
+                click:("$$('upload_window').hide();")}]},
+            body:{
+                content:'popup-content',
+            },
+        });
+        $("#upload-btn").webix_button({
+            width: 80,
+            height: 40,
+            label: 'Upload',
+        })
+        .attachEvent('onItemClick', function() {
+                uploadWindow.show();
+                $('#popup-content').show();
+            }
+        );
+    });
+    $(document).bind('dragover', function (e) {
+        var dropZone = $('#dropzone'),
+            timeout = window.dropZoneTimeout;
+        if (!timeout) {
+            dropZone.addClass('in');
+        } else {
+            clearTimeout(timeout);
+        }
+        var found = false,
+            node = e.target;
+        do {
+            if (node === dropZone[0]) {
+                found = true;
+                break;
+            }
+            node = node.parentNode;
+        } while (node != null);
+        if (found) {
+            dropZone.addClass('hover');
+        } else {
+            dropZone.removeClass('hover');
+        }
+        window.dropZoneTimeout = setTimeout(function () {
+            window.dropZoneTimeout = null;
+            dropZone.removeClass('in hover');
+        }, 100);
+    });
+</script>
+{% endblock %}
+{% block content %}
+<div id="popup-content" style="visibility: hidden;">
+    <p>test</p>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8">
+            <div id="upload-btn">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-1">
+            <script type="text/javascript">
+                $(document).ready(function() {
 
-        $.getJSON('http://localhost:8000/api/filesystem/?parent=' + '')
-        .done(function(data) {
-            var entries = [];
-            $.each(data, function(i, item) {
-                $.each(this, function(k, v) {
-                    var entry = {};
-                    entry['tree_id'] = item['id'];
-                    if (k == 'content_object') {
-                        $.each(v, function(k, v) {
-                            entry[k] = v;
-                        });
-                    }
-                    if (entry['size']) {
-                        // just to guarantee we're getting real objects
-                        entries.push(entry);
-                    }
-                });
-            });
-            var browser = webix.ui({
-                view: 'treetable',
-                columns: [
-                    { id: 'name', header: 'Name'},
-                    { id: 'size', header: 'Size'},
-                    { id: 'type', header: 'Type'},
-                    { id: 'items', header: 'Items'},
-                    { id: 'modified', header: 'Modified'},
-                    { id: 'modified_by', header: 'Modified By'}, // Django user
-                    // Not actually sure what this one is supposed to be.
-                    // { id: 'metadata', header: 'Metadata'}
-                ],
-                data: entries,
-                resizeColumn: true,
-                showOverlay: "Loading",
-                select: "row",
-                multiselect: true,
-            });
-            browser.attachEvent('onItemDblClick', function(id, e, node) {
-                e.preventDefault();
-                item = browser.getItem(id);
-                if (item['type'] == 'Folder') {
-                    $.getJSON('http://localhost:8000/api/filesystem/?parent=' + item['tree_id'])
+                    $.getJSON('http://localhost:8000/api/filesystem/?parent=' + '')
                     .done(function(data) {
                         var entries = [];
                         $.each(data, function(i, item) {
                             $.each(this, function(k, v) {
-                                    var entry = {};
-                                    entry['tree_id'] = item['id'];
-                                    if (k == 'content_object') {
-                                        $.each(v, function(k, v) {
-                                            entry[k] = v;
-                                        });
-                                    }
-                                    if (entry['size']) {
-                                        // just to guarantee we're getting real objects
-                                        entries.push(entry);
-                                    }
+                                var entry = {};
+                                entry['tree_id'] = item['id'];
+                                if (k == 'content_object') {
+                                    $.each(v, function(k, v) {
+                                        entry[k] = v;
+                                    });
+                                }
+                                if (entry['size']) {
+                                    // just to guarantee we're getting real objects
+                                    entries.push(entry);
+                                }
                             });
                         });
-                        browser.clearAll();
-                        browser.parse(entries, 'json');
+                        var browser = webix.ui({
+                            view: 'treetable',
+                            columns: [
+                                { id: 'name', header: 'Name'},
+                                { id: 'size', header: 'Size'},
+                                { id: 'type', header: 'Type'},
+                                { id: 'items', header: 'Items'},
+                                { id: 'modified', header: 'Modified'},
+                                { id: 'modified_by', header: 'Modified By'}, // Django user
+                                // Not actually sure what this one is supposed to be.
+                                // { id: 'metadata', header: 'Metadata'}
+                            ],
+                            data: entries,
+                            resizeColumn: true,
+                            showOverlay: "Loading",
+                            select: "row",
+                            multiselect: true,
+                        });
+                        browser.attachEvent('onItemDblClick', function(id, e, node) {
+                            e.preventDefault();
+                            item = browser.getItem(id);
+                            fileURL = '';
+                            if (item['type'] == 'Folder') {
+                                $.getJSON('http://localhost:8000/api/filesystem/?parent=' + item['tree_id'])
+                                .done(function(data) {
+                                    var entries = [];
+                                    $.each(data, function(i, item) {
+                                        $.each(this, function(k, v) {
+                                                var entry = {};
+                                                entry['tree_id'] = item['id'];
+                                                if (k == 'content_object') {
+                                                    $.each(v, function(k, v) {
+                                                        entry[k] = v;
+                                                    });
+                                                }
+                                                if (entry['size']) {
+                                                    // just to guarantee we're getting real objects
+                                                    entries.push(entry);
+                                                }
+                                        });
+                                    });
+                                    browser.clearAll();
+                                    browser.parse(entries, 'json');
+                                });
+                            } else {
+                                $.getJSON('http://localhost:8000/api/filesystem/file/' + item['id'])
+                                .done(function(data) {
+                                    fileURL = data['file'];
+                                    window.open(fileURL);
+                                });
+                            }
+                        });
                     });
-                } else {
-
-                }
-            });
-        });
-        //console.log(entries);
-    });
-</script>
+                    //console.log(entries);
+                });
+            </script>
+        </div>
+    </div>
+</div>
 {% endblock %}
