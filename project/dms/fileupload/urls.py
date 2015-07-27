@@ -7,6 +7,7 @@ file = [
     url(r'^$', views.FileList.as_view(), name='list_create'),
     url(r'^(?P<pk>[0-9]+)/$', views.FileDetail.as_view(), name='detail'),
     url(r'^(?P<file_id>\d+)/', views.download, name="download"),
+    url(r'^upload/$', views.UploadFile.as_view(), name='upload'),
 ]
 
 folder = [

@@ -2,6 +2,8 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics, filters
+from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
+from rest_framework.views import APIView
 from .models import File, Folder, FilesystemEntry
 from .serializers import (FilesystemEntrySerializer, FileSerializer,
                      FolderSerializer)
@@ -62,6 +64,12 @@ class FilesystemEntryList(generics.ListCreateAPIView):
         """
         queryset = FilesystemEntry.objects.all()
         parent = self.request.query_params.get('parent', None)
+        child = self.request.query_params.get('child', None)
+
+        if child is not None:
+            relation = FilesystemEntry.objects.get(pk=child)
+            relation = relation.parent
+            queryset = queryset.filter(parent=relation)
 
         if parent is not None:
             if parent == '':
@@ -74,3 +82,17 @@ class FilesystemEntryList(generics.ListCreateAPIView):
 class FilesystemEntryDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = FilesystemEntry.objects.all()
     serializer_class = FilesystemEntrySerializer
+
+
+class UploadFile(APIView):
+    parser_classes = (FileUploadParser, MultiPartParser, FormParser)
+
+    def post(self, request, format=None):
+        file = request.FILES['file']
+        filename = '/tmp/myfile'
+        with open(filename, 'wb+') as temp_file:
+            for chunk in file.chunks():
+                temp_file.write(chunk)
+
+        saved_file = open(filename)
+        print saved_file

@@ -17,7 +17,7 @@ class FolderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Folder
-        fields = ('name', 'created', 'modified', 'pid', 'modified_by',
+        fields = ('id', 'name', 'created', 'modified', 'pid', 'modified_by',
                   'items', 'type', 'size',)
 
 
@@ -47,7 +47,7 @@ class RelatedFilesystemField(serializers.RelatedField):
 
 class FilesystemEntrySerializer(serializers.ModelSerializer):
     content_object = RelatedFilesystemField(
-        queryset=FilesystemEntry.objects.all()
+        queryset=FilesystemEntry.objects.all(), required=False
         )
 
     class Meta:

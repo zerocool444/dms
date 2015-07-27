@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from mptt.models import MPTTModel, TreeForeignKey
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class Folder(models.Model):
@@ -35,18 +36,21 @@ class Folder(models.Model):
         """
         descendants = self.get_descendants()
         size = 0
-
-        for descendant in descendants:
-            entry = descendant.content_object
-            size += entry.size()
+        if descendants is not None:
+            for descendant in descendants:
+                entry = descendant.content_object
+                size += entry.size()
 
         return size
 
     def get_ptr(self):
         content_type = ContentType.objects.get(app_label='fileupload',
                                                model='folder')
-        tree_ptr = FilesystemEntry.objects.get(object_id=self.id,
-                                               content_type=content_type)
+        try:
+            tree_ptr = FilesystemEntry.objects.get(object_id=self.id,
+                                                   content_type=content_type)
+        except ObjectDoesNotExist:
+            tree_ptr = None
         return tree_ptr
 
     def get_children(self):
@@ -56,12 +60,18 @@ class Folder(models.Model):
 
     def get_descendants(self):
         tree_ptr = self.get_ptr()
-        descendants = tree_ptr.get_descendants()
+        if tree_ptr is not None:
+            descendants = tree_ptr.get_descendants()
+        else:
+            descendants = None
         return descendants
 
     def items(self):
         tree_ptr = self.get_ptr()
-        items = tree_ptr.get_descendant_count()
+        if tree_ptr is not None:
+            items = tree_ptr.get_descendant_count()
+        else:
+            items = 0
         return items
 
     def __str__(self):

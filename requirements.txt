@@ -1,5 +1,0 @@
-django-mptt
-django-filer
-djangorestframework
-django-filter
-markdown
